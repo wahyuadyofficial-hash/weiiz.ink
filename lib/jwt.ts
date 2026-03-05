@@ -1,24 +1,21 @@
 // lib/jwt.ts
-// ─────────────────────────────────────────
-// JWT Authentication Helpers (Node.js only)
-// ─────────────────────────────────────────
-
 import jwt from 'jsonwebtoken'
 import type { Secret, SignOptions } from 'jsonwebtoken'
 import { cookies } from 'next/headers'
 
-// Pastikan Node.js runtime (bukan Edge)
 export const runtime = 'nodejs'
 
-// ⛔ Kunci type secara eksplisit
-const SECRET: Secret = process.env.JWT_SECRET as Secret
+// Jangan throw di top-level (INI KUNCINYA)
+function getSecret(): Secret {
+  const secret = process.env.JWT_SECRET
+  if (!secret) {
+    throw new Error('JWT_SECRET is not defined')
+  }
+  return secret as Secret
+}
 
 const signOptions: SignOptions = {
   expiresIn: (process.env.JWT_EXPIRES_IN ?? '7d') as SignOptions['expiresIn'],
-}
-
-if (!SECRET) {
-  throw new Error('JWT_SECRET is not defined')
 }
 
 export interface JWTPayload {
@@ -30,13 +27,13 @@ export interface JWTPayload {
 
 // Buat token baru
 export function createToken(payload: JWTPayload): string {
-  return jwt.sign(payload, SECRET, signOptions)
+  return jwt.sign(payload, getSecret(), signOptions)
 }
 
 // Verifikasi token
 export function verifyToken(token: string): JWTPayload | null {
   try {
-    return jwt.verify(token, SECRET) as JWTPayload
+    return jwt.verify(token, getSecret()) as JWTPayload
   } catch {
     return null
   }
@@ -45,8 +42,7 @@ export function verifyToken(token: string): JWTPayload | null {
 // Ambil user dari cookie
 export function getCurrentUser(): JWTPayload | null {
   try {
-    const cookieStore = cookies()
-    const token = cookieStore.get('weiiz_token')?.value
+    const token = cookies().get('weiiz_token')?.value
     if (!token) return null
     return verifyToken(token)
   } catch {
