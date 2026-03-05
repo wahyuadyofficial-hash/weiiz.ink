@@ -4,6 +4,8 @@
 // POST /api/auth/login
 // ─────────────────────────────────────────
 
+export const runtime = 'nodejs' // export const runtime = 'nodejs'
+
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import bcrypt from 'bcryptjs'
@@ -81,7 +83,6 @@ export async function POST(req: NextRequest) {
     })
 
     return response
-
   } catch (error) {
     console.error('Login error:', error)
     return NextResponse.json(
