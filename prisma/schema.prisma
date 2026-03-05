@@ -1,0 +1,228 @@
+// prisma/schema.prisma
+// ────────────────────────────────────────────────────────────
+// Weiiz.ink — Database Schema
+// Jalankan: npx prisma db push  (untuk pertama kali)
+// ────────────────────────────────────────────────────────────
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── Enum ─────────────────────────────────────────────────────
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum PlanType {
+  FREE
+  STARTER
+  PRO
+  ELITE
+}
+
+enum BillingPeriod {
+  MONTHLY
+  YEARLY
+}
+
+enum TxnStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  EXPIRED
+}
+
+enum WithdrawStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  PROCESSED
+}
+
+enum ProductType {
+  EBOOK
+  TEMPLATE
+  COURSE
+  CONSULTATION
+  MEMBERSHIP
+  TICKET
+  FILE
+}
+
+// ── Models ────────────────────────────────────────────────────
+
+model User {
+  id            String   @id @default(cuid())
+  name          String
+  email         String   @unique
+  username      String   @unique
+  password      String?                        // null jika pakai Google OAuth
+  avatar        String?
+  bio           String?
+  role          Role     @default(USER)
+  emailVerified Boolean  @default(false)
+  verifyToken   String?
+  resetToken    String?
+  resetExpires  DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relasi
+  subscription  Subscription?
+  links         Link[]
+  products      Product[]
+  transactions  Transaction[]
+  withdrawals   Withdrawal[]
+  analytics     Analytics[]
+  domain        Domain?
+  teamMembers   TeamMember[]
+  teamOf        TeamMember[]  @relation("TeamOwner")
+}
+
+model Subscription {
+  id         String        @id @default(cuid())
+  userId     String        @unique
+  plan       PlanType      @default(FREE)
+  billing    BillingPeriod @default(MONTHLY)
+  startDate  DateTime      @default(now())
+  endDate    DateTime?
+  txFee      Float         @default(5.0)       // persentase fee transaksi
+  active     Boolean       @default(true)
+  gatewayId  String?                            // ID dari Midtrans/Stripe
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Link {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  url       String
+  type      String   @default("link")           // link | product | payment | whatsapp | download | affiliate
+  price     Float?
+  active    Boolean  @default(true)
+  order     Int      @default(0)
+  clicks    Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  analytics Analytics[]
+
+  @@index([userId])
+}
+
+model Product {
+  id          String      @id @default(cuid())
+  userId      String
+  name        String
+  description String?
+  type        ProductType @default(EBOOK)
+  price       Float
+  fileUrl     String?                           // URL file untuk auto-delivery
+  coverUrl    String?
+  active      Boolean     @default(true)
+  sold        Int         @default(0)
+  revenue     Float       @default(0)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  @@index([userId])
+}
+
+model Transaction {
+  id          String    @id @default(cuid())
+  userId      String                             // pemilik produk (seller)
+  productId   String?
+  buyerName   String
+  buyerEmail  String
+  amount      Float                              // harga asli
+  fee         Float     @default(0)             // fee platform
+  netAmount   Float                              // yang diterima seller
+  status      TxnStatus @default(PENDING)
+  method      String?                            // gopay | bca | qris | card
+  gatewayId   String?                            // order_id dari gateway
+  snapToken   String?                            // Midtrans snap token
+  notes       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user        User      @relation(fields: [userId], references: [id])
+  product     Product?  @relation(fields: [productId], references: [id])
+
+  @@index([userId])
+  @@index([gatewayId])
+}
+
+model Withdrawal {
+  id           String         @id @default(cuid())
+  userId       String
+  amount       Float
+  bank         String
+  accountNum   String
+  accountName  String
+  status       WithdrawStatus @default(PENDING)
+  adminNote    String?
+  processedAt  DateTime?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  user         User           @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+model Analytics {
+  id        String   @id @default(cuid())
+  userId    String
+  linkId    String?
+  event     String                              // click | view | purchase
+  device    String?                             // mobile | desktop | tablet
+  country   String?
+  city      String?
+  referer   String?
+  ip        String?
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
+  link      Link?    @relation(fields: [linkId], references: [id])
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model Domain {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  domain      String   @unique
+  verified    Boolean  @default(false)
+  verifyToken String?
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+model TeamMember {
+  id        String   @id @default(cuid())
+  ownerId   String
+  memberId  String
+  role      String   @default("editor")         // editor | viewer
+  createdAt DateTime @default(now())
+
+  owner     User     @relation("TeamOwner", fields: [ownerId], references: [id])
+  member    User     @relation(fields: [memberId], references: [id])
+
+  @@unique([ownerId, memberId])
+}
