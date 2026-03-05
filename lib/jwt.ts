@@ -1,13 +1,25 @@
 // lib/jwt.ts
 // ─────────────────────────────────────────
-// JWT Authentication Helpers
+// JWT Authentication Helpers (Node.js only)
 // ─────────────────────────────────────────
 
 import jwt from 'jsonwebtoken'
+import type { Secret, SignOptions } from 'jsonwebtoken'
 import { cookies } from 'next/headers'
 
-const SECRET = process.env.JWT_SECRET!
-const EXPIRES = process.env.JWT_EXPIRES_IN || '7d'
+// Pastikan Node.js runtime (bukan Edge)
+export const runtime = 'nodejs'
+
+// ⛔ Kunci type secara eksplisit
+const SECRET: Secret = process.env.JWT_SECRET as Secret
+
+const signOptions: SignOptions = {
+  expiresIn: (process.env.JWT_EXPIRES_IN ?? '7d') as SignOptions['expiresIn'],
+}
+
+if (!SECRET) {
+  throw new Error('JWT_SECRET is not defined')
+}
 
 export interface JWTPayload {
   userId: string
@@ -18,7 +30,7 @@ export interface JWTPayload {
 
 // Buat token baru
 export function createToken(payload: JWTPayload): string {
-  return jwt.sign(payload, SECRET, { expiresIn: EXPIRES })
+  return jwt.sign(payload, SECRET, signOptions)
 }
 
 // Verifikasi token
@@ -30,7 +42,7 @@ export function verifyToken(token: string): JWTPayload | null {
   }
 }
 
-// Ambil user dari cookie (untuk Server Components)
+// Ambil user dari cookie
 export function getCurrentUser(): JWTPayload | null {
   try {
     const cookieStore = cookies()
@@ -48,7 +60,7 @@ export function setAuthCookie(token: string) {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
-    maxAge: 60 * 60 * 24 * 7, // 7 hari
+    maxAge: 60 * 60 * 24 * 7,
     path: '/',
   })
 }
