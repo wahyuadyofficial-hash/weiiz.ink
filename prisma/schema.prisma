@@ -153,7 +153,7 @@ model Transaction {
   netAmount   Float                              // yang diterima seller
   status      TxnStatus @default(PENDING)
   method      String?                            // gopay | bca | qris | card
-  gatewayId   String?                            // order_id dari gateway
+  gatewayId   String?   @unique                            // order_id dari gateway
   snapToken   String?                            // Midtrans snap token
   notes       String?
   createdAt   DateTime  @default(now())
@@ -163,7 +163,7 @@ model Transaction {
   product     Product?  @relation(fields: [productId], references: [id])
 
   @@index([userId])
-  @@index([gatewayId])
+  
 }
 
 model Withdrawal {
