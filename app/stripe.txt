@@ -1,6 +1,0 @@
-
-# ── STRIPE (Payment International) ───────────────────────────
-# Daftar di: https://dashboard.stripe.com
-STRIPE_SECRET_KEY=your_stripe_secret_key
-STRIPE_PUBLIC_KEY=your_stripe_public_key
-STRIPE_WEBHOOK_SECRET="whsec_xxxxxxxxxxxxxxxxxxxxxxxx"
