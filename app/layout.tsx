@@ -4,7 +4,7 @@ import './globals.css'
 export const metadata: Metadata = {
   title: {
     default: 'Weiiz.ink',
-    template: '%s — Weiiz.ink',
+    template: '%s - Weiiz.ink',
   },
   description: 'Where Bio Becomes Benefit',
 }
