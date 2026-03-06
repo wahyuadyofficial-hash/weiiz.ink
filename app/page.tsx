@@ -78,7 +78,7 @@ const ToastCtx = createContext(null);
 const useToast = () => useContext(ToastCtx);
 
 function ToastProvider({ children }: { children: React.ReactNode }) {
-  const [toasts, setToasts] = useState([]);
+  const [toasts, setToasts] = useState<{id: number; msg: string; type: string}[]>([]);
   const add = useCallback((msg: string, type: string = 'success') => {
     const id = Date.now();
     setToasts(p => [...p, { id, msg, type }]);
