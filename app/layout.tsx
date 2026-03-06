@@ -24,13 +24,3 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </html>
   )
 }
-```
-
----
-
-**Fix `app/[username]/page.tsx`** — pastikan file `BioClient.tsx` ada di folder yang sama:
-```
-app/
-└── [username]/
-    ├── page.tsx        ← sudah ada
-    └── BioClient.tsx   ← ini yang hilang, harus ada di sini
