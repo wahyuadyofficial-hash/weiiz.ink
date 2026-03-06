@@ -77,7 +77,7 @@ const FontStyle = () => (
 const ToastCtx = createContext(null);
 const useToast = () => useContext(ToastCtx);
 
-function ToastProvider({ children }) {
+function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState([]);
   const add = useCallback((msg, type = 'success') => {
     const id = Date.now();
