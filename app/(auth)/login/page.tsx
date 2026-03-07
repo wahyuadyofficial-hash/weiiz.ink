@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
 import { signIn } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
-export default function LoginPage() {
+// ── Inner component — pakai useSearchParams, wajib di dalam Suspense ──
+function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [email,    setEmail]    = useState('')
@@ -17,7 +18,6 @@ export default function LoginPage() {
 
   useEffect(() => {
     setMounted(true)
-    // Tampilkan error dari URL kalau ada (misal dari NextAuth callback)
     const err = searchParams.get('error')
     if (err === 'CredentialsSignin') setError('Email atau password salah')
     else if (err === 'token_failed')  setError('Sesi bermasalah, coba lagi')
@@ -31,7 +31,7 @@ export default function LoginPage() {
     setLoading(true)
     try {
       const res = await signIn('credentials', {
-        email:    email.toLowerCase().trim(),
+        email: email.toLowerCase().trim(),
         password,
         redirect: false,
       })
@@ -107,7 +107,6 @@ export default function LoginPage() {
       `}</style>
 
       <div className="wzpage">
-
         {/* ══ KIRI ══ */}
         <div className="wzleft">
           <div className="wzgrid" />
@@ -141,7 +140,7 @@ export default function LoginPage() {
                 </div>
               ))}
             </div>
-            <Link href="/register" style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:8, padding:'13px 22px', borderRadius:14, border:'1.5px solid rgba(56,189,248,.3)', color:'#38bdf8', fontWeight:700, fontSize:14, textDecoration:'none', transition:'all .2s' }}>
+            <Link href="/register" style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:8, padding:'13px 22px', borderRadius:14, border:'1.5px solid rgba(56,189,248,.3)', color:'#38bdf8', fontWeight:700, fontSize:14, textDecoration:'none' }}>
               ✦ Daftar Gratis Sekarang →
             </Link>
           </div>
@@ -149,7 +148,6 @@ export default function LoginPage() {
 
         {/* ══ KANAN ══ */}
         <div className="wzright">
-          {/* Banner register */}
           <div className="wz-register-banner">
             <div>
               <p style={{ fontSize:13, color:'#7ba3c0', fontWeight:500, marginBottom:2 }}>Belum punya akun?</p>
@@ -163,7 +161,6 @@ export default function LoginPage() {
 
           <div className="wz-form-area">
             <div className={mounted ? 'wzform-c' : ''} style={{ width:'100%', maxWidth:384, display:'flex', flexDirection:'column', gap:0 }}>
-
               <div style={{ marginBottom:24 }}>
                 <h1 style={{ fontSize:22, fontWeight:900, color:'#f0f9ff', letterSpacing:'-.6px', marginBottom:6 }}>Selamat Datang Kembali 👋</h1>
                 <p style={{ fontSize:13.5, color:'#7ba3c0', fontWeight:500 }}>Masuk ke dashboard kamu</p>
@@ -232,7 +229,6 @@ export default function LoginPage() {
                 </button>
               </form>
 
-              {/* Register card */}
               <div style={{ marginTop:24 }}>
                 <div className="wz-register-card">
                   <div>
@@ -254,5 +250,14 @@ export default function LoginPage() {
         </div>
       </div>
     </>
+  )
+}
+
+// ── Export default dengan Suspense wrapper ──
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginForm />
+    </Suspense>
   )
 }
