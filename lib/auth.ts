@@ -2,8 +2,8 @@ import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import prisma from "@/lib/prisma";
-import bcrypt from "bcrypt";
+import { PrismaAdapter } from "@next-auth/prisma-adapter"; // Pakai kutip
+import bcrypt from "bcrypt"; // Pakai kutip
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
