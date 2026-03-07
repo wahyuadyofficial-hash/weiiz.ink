@@ -3,12 +3,12 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import bcrypt from "bcrypt";
-import prisma from "@/lib/prisma"; // <--- PENTING: Harus diimport agar tidak error
+import prisma from "@/lib/prisma";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   session: {
-    strategy: "jwt", 
+    strategy: "jwt",
   },
   providers: [
     GoogleProvider({
@@ -33,20 +33,32 @@ export const authOptions: NextAuthOptions = {
         const isPasswordValid = await bcrypt.compare(credentials.password, user.password);
         if (!isPasswordValid) return null;
 
-        return { id: user.id, email: user.email, name: user.name };
+        // PERBAIKAN: Sertakan semua field yang diminta oleh Type User
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          username: user.username,
+          role: user.role,
+          avatar: user.avatar,
+        } as any; 
       },
     }),
   ],
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
+        token.id = (user as any).id;
+        token.username = (user as any).username;
+        token.role = (user as any).role;
       }
       return token;
     },
     async session({ session, token }) {
-      if (session?.user) {
+      if (session.user) {
         (session.user as any).id = token.id;
+        (session.user as any).username = token.username;
+        (session.user as any).role = token.role;
       }
       return session;
     },
