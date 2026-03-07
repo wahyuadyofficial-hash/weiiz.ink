@@ -1,5 +1,7 @@
 'use client'
 
+export const dynamic = 'force-dynamic'
+
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -33,8 +35,6 @@ export default function LoginPage() {
         return
       }
 
-      // Sukses — cookie weiiz_token sudah di-set oleh API
-      // Gunakan router.push, BUKAN window.location.href
       router.push('/dashboard')
       router.refresh()
 
@@ -206,7 +206,9 @@ export default function LoginPage() {
 
               {/* Divider */}
               <div className="wzdiv">
-                <div className="wzdiv-line" /><span style={{ fontSize:12, color:'#3a5f80', fontWeight:500, whiteSpace:'nowrap' }}>atau</span><div className="wzdiv-line" />
+                <div className="wzdiv-line" />
+                <span style={{ fontSize:12, color:'#3a5f80', fontWeight:500, whiteSpace:'nowrap' }}>atau</span>
+                <div className="wzdiv-line" />
               </div>
 
               {/* Google */}
