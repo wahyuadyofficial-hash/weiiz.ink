@@ -1,11 +1,6 @@
 'use client'
 
-export const dynamic = 'force-dynamic'  // ← tambahkan baris ini
-
-import { useState } from 'react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-// ... sisa kode sama
+export const dynamic = 'force-dynamic'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
