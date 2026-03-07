@@ -477,11 +477,19 @@ export default function RegisterPage() {
                 </div>
 
                 {/* 5 — Checkbox */}
-                <label className="wzcheck">
-                  <div role="checkbox" aria-checked={agreed} tabIndex={0}
+                <label className="wzcheck" style={{ cursor:'pointer' }}>
+                  {/* Native checkbox — disembunyikan, diganti visual custom */}
+                  <input
+                    type="checkbox"
+                    checked={agreed}
+                    onChange={e => setAgreed(e.target.checked)}
+                    style={{ position:'absolute', opacity:0, width:0, height:0, pointerEvents:'none' }}
+                  />
+                  {/* Visual custom checkbox */}
+                  <div
                     className={`wzcheck-box ${agreed ? 'on' : ''}`}
-                    onClick={() => setAgreed(v => !v)}
-                    onKeyDown={e => e.key === ' ' && setAgreed(v => !v)}
+                    style={{ flexShrink:0, marginTop:1 }}
+                    aria-hidden="true"
                   >
                     {agreed && <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1.5 5l2.5 2.5 5-5" stroke="#040d1a" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                   </div>
