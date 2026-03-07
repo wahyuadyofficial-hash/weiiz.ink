@@ -226,3 +226,46 @@ model TeamMember {
 
   @@unique([ownerId, memberId])
 }
+model Donation {
+  id          String   @id @default(cuid())
+  creatorId   String
+  donorName   String
+  donorEmail  String?
+  message     String?
+  amount      Int      // dalam Rupiah
+  isAnonymous Boolean  @default(false)
+  status      String   @default("pending") // pending | paid | failed
+  paymentId   String?  // Midtrans order ID
+  paymentMethod String? // midtrans | stripe
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  creator     User     @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+
+  @@index([creatorId])
+  @@index([status])
+}
+
+model DonationGoal {
+  id            String   @id @default(cuid())
+  creatorId     String
+  title         String
+  description   String?
+  targetAmount  Int      // dalam Rupiah
+  currentAmount Int      @default(0)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  creator       User     @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+
+  @@index([creatorId])
+}
+
+// ============================================================
+// TAMBAHKAN relasi berikut ke model User yang sudah ada:
+//
+//   donations     Donation[]
+//   donationGoals DonationGoal[]
+//
+// ============================================================
