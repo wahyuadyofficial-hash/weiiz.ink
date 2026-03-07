@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+﻿import type { Metadata } from 'next'
 import { Syne, DM_Sans } from 'next/font/google'
 import './globals.css'
 
@@ -15,8 +15,8 @@ const dmSans = DM_Sans({
 })
 
 export const metadata: Metadata = {
-  title: 'Weiiz — Where Bio Becomes Benefit',
-  description: 'Where Bio Becomes Benefit',
+  title: 'Weiiz â€” Where Bio Becomes Benefit',
+  description: 'Platform monetisasi bio link untuk creator Indonesia',
 }
 
 export default function RootLayout({
@@ -26,6 +26,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id" className={`${syne.variable} ${dmSans.variable}`}>
+      <head>
+        <meta charSet="utf-8" />
+      </head>
       <body>{children}</body>
     </html>
   )

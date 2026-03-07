@@ -23,16 +23,14 @@ export default function Footer() {
               <div className="text-white/60 font-semibold text-sm mb-3">{col.title}</div>
               <ul className="flex flex-col gap-2">
                 {col.links.map((link) => (
-                  <li key={link}>
-                    <Link href="#" className="text-white/30 hover:text-white/70 text-sm transition-colors duration-200">{link}</Link>
-                  </li>
+                  <li key={link}><Link href="#" className="text-white/30 hover:text-white/70 text-sm transition-colors">{link}</Link></li>
                 ))}
               </ul>
             </div>
           ))}
         </div>
         <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-white/20 text-xs">Â© 2024 Weiiz. Dibuat dengan â¤ï¸ untuk creator Indonesia.</p>
+          <p className="text-white/20 text-xs">&copy; 2024 Weiiz. Dibuat dengan &#10084;&#65039; untuk creator Indonesia.</p>
           <div className="flex items-center gap-3 flex-wrap">
             <span className="text-white/20 text-xs">Pembayaran via</span>
             {["Midtrans", "QRIS", "VA Bank", "GoPay", "OVO"].map((p) => (
