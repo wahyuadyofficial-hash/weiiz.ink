@@ -1,7 +1,5 @@
-import NextAuth from next-auth;
-import { authOptions } from @libauth;
+import NextAuth from "next-auth"; // Pakai kutip
+import { authOptions } from "@/lib/auth"; // Pakai kutip & alias yang benar
 
 const handler = NextAuth(authOptions);
-
- Next.js App Router wajib export GET dan POST secara eksplisit
 export { handler as GET, handler as POST };
