@@ -353,3 +353,42 @@ export default function DashboardPage() {
     </div>
   )
 }
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import prisma from "@/lib/prisma";
+
+// Ini memastikan halaman dashboard selalu dirender ulang dengan data terbaru
+export const dynamic = 'force-dynamic';
+
+export default async function DashboardPage() {
+  // 1. Ambil session langsung di server
+  const session = await getServerSession(authOptions);
+
+  // 2. Proteksi ganda (jika middleware terlewat)
+  if (!session?.user?.email) {
+    redirect("/login");
+  }
+
+  // 3. Ambil data user & statistik dari database
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email },
+    select: { name: true, username: true } // Ambil yang perlu saja
+  });
+
+  return (
+    <main className="p-8 max-w-4xl mx-auto">
+      <h1 className="text-3xl font-bold mb-4">
+        Selamat datang, {user?.name || "Kreator"}!
+      </h1>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="p-6 bg-white shadow rounded-lg border">
+          <h2 className="text-gray-500 text-sm font-semibold">Username Biolink</h2>
+          <p className="text-xl font-bold mt-2">weiiz.ink/{user?.username || "belum-diatur"}</p>
+        </div>
+        {/* Tambahkan card statistik lainnya di sini */}
+      </div>
+    </main>
+  );
+}
