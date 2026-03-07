@@ -1,4 +1,4 @@
-import Navbar from "@/components/landing/Navbar";
+﻿import Navbar from "@/components/landing/Navbar";
 import HeroSection from "@/components/landing/HeroSection";
 import SocialProofSection from "@/components/landing/SocialProofSection";
 import FeaturesSection from "@/components/landing/FeaturesSection";
