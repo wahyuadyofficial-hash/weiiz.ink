@@ -1,4 +1,7 @@
 // app/api/links/route.ts
+// GET  /api/links  → ambil semua link milik user
+// POST /api/links  → tambah link baru
+
 import { NextResponse } from 'next/server'
 import { getCurrentUser } from '@/lib/jwt'
 
@@ -15,7 +18,7 @@ export async function GET() {
 
     return NextResponse.json({
       links: [
-        { id: '1', title: 'Order via WhatsApp',    url: 'https://wa.me/628123456789',  type: 'whatsapp',  active: true,  clicks: 142, revenue: 0,      order: 0 },
+        { id: '1', title: 'Order via WhatsApp',    url: 'https://wa.me/6285373530295', type: 'whatsapp',  active: true,  clicks: 142, revenue: 0,      order: 0 },
         { id: '2', title: 'E-book Marketing',      url: 'https://weiiz.ink/p/ebook',   type: 'product',   active: true,  clicks: 89,  revenue: 890000, order: 1, price: 99000 },
         { id: '3', title: 'Instagram',             url: 'https://instagram.com/budi',  type: 'link',      active: true,  clicks: 310, revenue: 0,      order: 2 },
         { id: '4', title: 'Preset Lightroom Pack', url: 'https://weiiz.ink/p/preset',  type: 'download',  active: false, clicks: 44,  revenue: 352000, order: 3, price: 79000 },
@@ -41,7 +44,7 @@ export async function POST(request: Request) {
     // TODO: ganti dengan insert DB asli
     // const maxOrder = await prisma.link.count({ where: { userId: user.id } })
     // const newLink = await prisma.link.create({
-    //   data: { title, url, type, price, active: true, clicks: 0, revenue: 0, order: maxOrder, userId: user.id }
+    //   data: { title, url, type, price, active: true, clicks: 0, order: maxOrder, userId: user.id }
     // })
 
     const newLink = {
