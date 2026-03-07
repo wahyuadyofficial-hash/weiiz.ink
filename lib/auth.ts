@@ -2,13 +2,13 @@ import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { PrismaAdapter } from "@next-auth/prisma-adapter"; // Pakai kutip
-import bcrypt from "bcrypt"; // Pakai kutip
+import bcrypt from "bcrypt";
+import prisma from "@/lib/prisma"; // <--- PENTING: Harus diimport agar tidak error
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   session: {
-    strategy: "jwt", // Wajib JWT untuk Vercel / Serverless
+    strategy: "jwt", 
   },
   providers: [
     GoogleProvider({
@@ -28,7 +28,6 @@ export const authOptions: NextAuthOptions = {
           where: { email: credentials.email },
         });
 
-        // Jika user daftar pakai Google, mereka mungkin tidak punya password
         if (!user || !user.password) return null;
 
         const isPasswordValid = await bcrypt.compare(credentials.password, user.password);
@@ -46,14 +45,14 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      if (session.user) {
+      if (session?.user) {
         (session.user as any).id = token.id;
       }
       return session;
     },
   },
   pages: {
-    signIn: "/login", // Redirect ke sini jika user belum login
+    signIn: "/login",
   },
   secret: process.env.NEXTAUTH_SECRET,
 };
