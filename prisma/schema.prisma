@@ -71,6 +71,8 @@ model User {
   verifyToken   String?
   resetToken    String?
   resetExpires  DateTime?
+  googleId      String?
+  plan          String   @default("FREE")
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -84,10 +86,6 @@ model User {
   domain        Domain?
   teamMembers   TeamMember[]
   teamOf        TeamMember[]  @relation("TeamOwner")
-
-  // ✅ FIX: tambah relasi balik untuk Donation & DonationGoal
-  donations     Donation[]
-  donationGoals DonationGoal[]
 }
 
 model Subscription {
@@ -157,7 +155,7 @@ model Transaction {
   netAmount   Float                              // yang diterima seller
   status      TxnStatus @default(PENDING)
   method      String?                            // gopay | bca | qris | card
-  gatewayId   String?   @unique                 // order_id dari gateway
+  gatewayId   String?   @unique                            // order_id dari gateway
   snapToken   String?                            // Midtrans snap token
   notes       String?
   createdAt   DateTime  @default(now())
@@ -167,6 +165,7 @@ model Transaction {
   product     Product?  @relation(fields: [productId], references: [id])
 
   @@index([userId])
+  
 }
 
 model Withdrawal {
@@ -228,40 +227,4 @@ model TeamMember {
   member    User     @relation(fields: [memberId], references: [id])
 
   @@unique([ownerId, memberId])
-}
-
-model Donation {
-  id            String   @id @default(cuid())
-  creatorId     String
-  donorName     String
-  donorEmail    String?
-  message       String?
-  amount        Int      // dalam Rupiah
-  isAnonymous   Boolean  @default(false)
-  status        String   @default("pending")    // pending | paid | failed
-  paymentId     String?                          // Midtrans order ID
-  paymentMethod String?                          // midtrans | stripe
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  creator       User     @relation(fields: [creatorId], references: [id], onDelete: Cascade)
-
-  @@index([creatorId])
-  @@index([status])
-}
-
-model DonationGoal {
-  id            String   @id @default(cuid())
-  creatorId     String
-  title         String
-  description   String?
-  targetAmount  Int      // dalam Rupiah
-  currentAmount Int      @default(0)
-  isActive      Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  creator       User     @relation(fields: [creatorId], references: [id], onDelete: Cascade)
-
-  @@index([creatorId])
 }
