@@ -4,7 +4,7 @@ import './globals.css'
 
 const syne = Syne({
   subsets: ['latin'],
-  weight: ['700', '800', '900'],
+  weight: ['400', '700', '800'],
   variable: '--font-syne',
 })
 
