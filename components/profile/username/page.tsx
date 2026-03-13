@@ -27,15 +27,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description,
       url,
       type: "profile",
-      images: user.avatarUrl
-        ? [{ url: user.avatarUrl, width: 400, height: 400, alt: user.name || user.username }]
+      images: user.avatar
+        ? [{ url: user.avatar, width: 400, height: 400, alt: user.name || user.username }]
         : [],
     },
     twitter: {
       card: "summary",
       title,
       description,
-      images: user.avatarUrl ? [user.avatarUrl] : [],
+      images: user.avatar ? [user.avatar] : [],
     },
     alternates: { canonical: url },
   };
@@ -51,7 +51,7 @@ async function getUser(username: string) {
         username: true,
         name: true,
         bio: true,
-        avatarUrl: true,
+        avatar: true,
         instagram: true,
         twitter: true,
         youtube: true,

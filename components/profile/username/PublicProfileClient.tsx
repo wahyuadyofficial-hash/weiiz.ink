@@ -41,7 +41,7 @@ interface User {
   username: string;
   name?: string;
   bio?: string;
-  avatarUrl?: string;
+  avatar?: string;
   instagram?: string;
   twitter?: string;
   youtube?: string;
@@ -246,8 +246,8 @@ export default function PublicProfileClient({ user }: { user: User }) {
           {/* Avatar */}
           <div className="relative inline-block mb-4">
             <div className="w-24 h-24 rounded-3xl overflow-hidden bg-gradient-to-br from-indigo-200 to-purple-200 mx-auto ring-4 ring-white shadow-lg">
-              {user.avatarUrl ? (
-                <img src={user.avatarUrl} alt={user.name || user.username} className="w-full h-full object-cover" />
+              {user.avatar ? (
+                <img src={user.avatar} alt={user.name || user.username} className="w-full h-full object-cover" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-3xl font-bold text-white">
                   {(user.name || user.username).charAt(0).toUpperCase()}
