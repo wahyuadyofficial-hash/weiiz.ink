@@ -24,7 +24,7 @@ export default function HomePage() {
   const [statusTime, setStatusTime] = useState('');
   const [loginLoading, setLoginLoading] = useState(false);
   const [registerLoading, setRegisterLoading] = useState(false);
-  const toastTimer = useRef<ReturnType<typeof setTimeout>>(null);
+  const toastTimer = useRef<ReturnType<typeof setTimeout>>(null); null>(null);
 
   const prices = { creator: [39000, 29000], pro: [99000, 74000], business: [249000, 187000] };
   const fmt = (n: number) => 'Rp' + n.toLocaleString('id-ID');
