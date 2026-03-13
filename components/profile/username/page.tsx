@@ -57,7 +57,7 @@ async function getUser(username: string) {
         youtube: true,
         website: true,
         links: {
-          where: { isActive: true },
+          where: { active: true },
           orderBy: { order: "asc" },
           select: {
             id: true,
@@ -65,11 +65,11 @@ async function getUser(username: string) {
             url: true,
             icon: true,
             type: true,
-            isActive: true,
+            active: true,
           },
         },
         products: {
-          where: { isActive: true },
+          where: { active: true },
           orderBy: { createdAt: "desc" },
           select: {
             id: true,
