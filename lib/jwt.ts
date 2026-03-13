@@ -47,3 +47,21 @@ export function verifyAdmin(authHeader: string | null): TokenPayload & JwtPayloa
 
   return decoded;
 }
+
+/**
+ * Alias for signToken — used by auth/login & auth/register routes
+ */
+export function createToken(payload: TokenPayload): string {
+  return signToken(payload);
+}
+
+/**
+ * Get current user from Next.js Request object
+ * Used by API routes to identify the logged-in user
+ */
+export function getCurrentUser(request: Request): TokenPayload & JwtPayload {
+  const authHeader = request.headers.get('authorization');
+  const token = extractToken(authHeader);
+  if (!token) throw new Error('Unauthorized: token tidak ditemukan');
+  return verifyToken(token);
+}
