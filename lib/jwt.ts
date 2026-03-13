@@ -56,12 +56,17 @@ export function createToken(payload: TokenPayload): string {
 }
 
 /**
- * Get current user from Next.js Request object
- * Used by API routes to identify the logged-in user
+ * Get current user from Next.js cookies (no argument needed)
+ * Used by API routes: const user = await getCurrentUser()
  */
-export function getCurrentUser(request: Request): TokenPayload & JwtPayload {
-  const authHeader = request.headers.get('authorization');
-  const token = extractToken(authHeader);
-  if (!token) throw new Error('Unauthorized: token tidak ditemukan');
-  return verifyToken(token);
+export async function getCurrentUser(): Promise<(TokenPayload & JwtPayload) | null> {
+  try {
+    const { cookies } = await import('next/headers');
+    const cookieStore = cookies();
+    const token = cookieStore.get('token')?.value;
+    if (!token) return null;
+    return verifyToken(token);
+  } catch {
+    return null;
+  }
 }
