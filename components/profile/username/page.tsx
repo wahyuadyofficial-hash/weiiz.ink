@@ -52,10 +52,6 @@ async function getUser(username: string) {
         name: true,
         bio: true,
         avatar: true,
-        instagram: true,
-        twitter: true,
-        youtube: true,
-        website: true,
         links: {
           where: { active: true },
           orderBy: { order: "asc" },
@@ -63,7 +59,6 @@ async function getUser(username: string) {
             id: true,
             title: true,
             url: true,
-            icon: true,
             type: true,
             active: true,
           },
@@ -76,10 +71,9 @@ async function getUser(username: string) {
             name: true,
             description: true,
             price: true,
-            originalPrice: true,
-            coverImage: true,
-            category: true,
-            salesCount: true,
+            coverUrl: true,
+            type: true,
+            sold: true,
           },
         },
       },
@@ -91,16 +85,16 @@ async function getUser(username: string) {
 }
 
 // ─── Track page view ─────────────────────────────────────
-async function trackPageView(userId: string, req?: Request) {
+async function trackPageView(userId: string) {
   try {
-    await prisma.pageView.create({
+    await prisma.analytics.create({
       data: {
         userId,
-        source: "direct",
+        event: "view",
       },
     });
   } catch {
-    // Silent fail — tracking tidak boleh break page
+    // Silent fail
   }
 }
 
@@ -108,7 +102,6 @@ async function trackPageView(userId: string, req?: Request) {
 export default async function UserProfilePage({ params }: PageProps) {
   const username = params.username.toLowerCase();
 
-  // Validate username format
   if (!/^[a-z0-9_-]{3,30}$/.test(username)) {
     notFound();
   }

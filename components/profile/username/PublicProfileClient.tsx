@@ -3,16 +3,12 @@
 import { useState } from "react";
 import {
   Globe,
-  Instagram,
-  Twitter,
-  Youtube,
-  ShoppingBag,
   ExternalLink,
   Share2,
   Check,
   Heart,
   Download,
-  Tag,
+  ShoppingBag,
 } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────
@@ -20,32 +16,26 @@ interface Link {
   id: string;
   title: string;
   url: string;
-  icon?: string;
   type: string;
-  isActive: boolean;
+  active: boolean;
 }
 
 interface Product {
   id: string;
   name: string;
-  description: string;
+  description?: string | null;
   price: number;
-  originalPrice?: number;
-  coverImage?: string;
-  category: string;
-  salesCount: number;
+  coverUrl?: string | null;
+  type: string;
+  sold: number;
 }
 
 interface User {
   id: string;
   username: string;
-  name?: string;
-  bio?: string;
-  avatar?: string;
-  instagram?: string;
-  twitter?: string;
-  youtube?: string;
-  website?: string;
+  name: string;
+  bio?: string | null;
+  avatar?: string | null;
   links: Link[];
   products: Product[];
 }
@@ -59,18 +49,13 @@ function formatRupiah(n: number) {
   }).format(n);
 }
 
-function getDiscountPct(price: number, original: number) {
-  return Math.round(((original - price) / original) * 100);
-}
-
 // ─── Link Button ──────────────────────────────────────────
-function LinkButton({ link, username }: { link: Link; username: string }) {
+function LinkButton({ link }: { link: Link }) {
   const [clicked, setClicked] = useState(false);
 
   const handleClick = async () => {
     setClicked(true);
     setTimeout(() => setClicked(false), 1500);
-    // Track click
     try {
       await fetch(`/api/links/${link.id}/click`, { method: "POST" });
     } catch { /* silent */ }
@@ -89,13 +74,9 @@ function LinkButton({ link, username }: { link: Link; username: string }) {
         }`}
     >
       <div className="flex items-center gap-3">
-        {link.icon ? (
-          <span className="text-lg leading-none">{link.icon}</span>
-        ) : (
-          <div className="w-7 h-7 rounded-lg bg-gray-100 group-hover:bg-indigo-100 flex items-center justify-center transition">
-            <Globe size={14} className="text-gray-400 group-hover:text-indigo-500 transition" />
-          </div>
-        )}
+        <div className="w-7 h-7 rounded-lg bg-gray-100 group-hover:bg-indigo-100 flex items-center justify-center transition">
+          <Globe size={14} className="text-gray-400 group-hover:text-indigo-500 transition" />
+        </div>
         <span>{link.title}</span>
       </div>
       {clicked ? (
@@ -130,38 +111,26 @@ function ProductCard({ product, username }: { product: Product; username: string
     }
   };
 
-  const discountPct =
-    product.originalPrice && product.originalPrice > product.price
-      ? getDiscountPct(product.price, product.originalPrice)
-      : 0;
-
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden group">
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
       {/* Cover */}
       <div className="relative h-36 bg-gradient-to-br from-indigo-50 to-purple-50">
-        {product.coverImage ? (
-          <img src={product.coverImage} alt={product.name} className="w-full h-full object-cover" />
+        {product.coverUrl ? (
+          <img src={product.coverUrl} alt={product.name} className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <ShoppingBag size={32} className="text-indigo-200" />
           </div>
         )}
-        {/* Badges */}
-        <div className="absolute top-3 left-3 flex gap-1.5">
-          <span className="bg-white/90 backdrop-blur text-xs font-medium text-gray-600 px-2 py-0.5 rounded-full flex items-center gap-1">
-            <Tag size={10} />
-            {product.category}
+        <div className="absolute top-3 left-3">
+          <span className="bg-white/90 backdrop-blur text-xs font-medium text-gray-600 px-2 py-0.5 rounded-full">
+            {product.type}
           </span>
-          {discountPct > 0 && (
-            <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-              -{discountPct}%
-            </span>
-          )}
         </div>
-        {product.salesCount > 0 && (
+        {product.sold > 0 && (
           <span className="absolute top-3 right-3 bg-white/90 backdrop-blur text-xs text-gray-500 px-2 py-0.5 rounded-full flex items-center gap-1">
             <Download size={10} />
-            {product.salesCount}
+            {product.sold}
           </span>
         )}
       </div>
@@ -172,14 +141,7 @@ function ProductCard({ product, username }: { product: Product; username: string
           <p className="text-xs text-gray-400 mt-1 line-clamp-2">{product.description}</p>
         )}
         <div className="flex items-center justify-between mt-3">
-          <div>
-            <span className="text-indigo-600 font-bold text-base">{formatRupiah(product.price)}</span>
-            {discountPct > 0 && (
-              <span className="text-gray-300 text-xs line-through ml-2">
-                {formatRupiah(product.originalPrice!)}
-              </span>
-            )}
-          </div>
+          <span className="text-indigo-600 font-bold text-base">{formatRupiah(product.price)}</span>
           <button
             onClick={handleBuy}
             disabled={buying}
@@ -190,31 +152,6 @@ function ProductCard({ product, username }: { product: Product; username: string
         </div>
       </div>
     </div>
-  );
-}
-
-// ─── Social Icon ──────────────────────────────────────────
-function SocialLink({
-  href,
-  icon: Icon,
-  label,
-  color,
-}: {
-  href: string;
-  icon: React.ElementType;
-  label: string;
-  color: string;
-}) {
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label={label}
-      className={`w-10 h-10 rounded-xl flex items-center justify-center border border-gray-200 hover:border-transparent transition-all hover:shadow-sm ${color}`}
-    >
-      <Icon size={16} />
-    </a>
   );
 }
 
@@ -235,7 +172,6 @@ export default function PublicProfileClient({ user }: { user: User }) {
 
   const hasProducts = user.products.length > 0;
   const hasLinks = user.links.length > 0;
-  const hasSocial = user.instagram || user.twitter || user.youtube || user.website;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-indigo-50/50 via-white to-white">
@@ -243,7 +179,6 @@ export default function PublicProfileClient({ user }: { user: User }) {
 
         {/* Profile Header */}
         <div className="text-center mb-8">
-          {/* Avatar */}
           <div className="relative inline-block mb-4">
             <div className="w-24 h-24 rounded-3xl overflow-hidden bg-gradient-to-br from-indigo-200 to-purple-200 mx-auto ring-4 ring-white shadow-lg">
               {user.avatar ? (
@@ -256,38 +191,15 @@ export default function PublicProfileClient({ user }: { user: User }) {
             </div>
           </div>
 
-          {/* Name & Username */}
-          <h1 className="text-xl font-bold text-gray-900">
-            {user.name || user.username}
-          </h1>
+          <h1 className="text-xl font-bold text-gray-900">{user.name || user.username}</h1>
           <p className="text-sm text-gray-400 mt-0.5">@{user.username}</p>
 
-          {/* Bio */}
           {user.bio && (
             <p className="text-sm text-gray-600 mt-3 leading-relaxed max-w-xs mx-auto">
               {user.bio}
             </p>
           )}
 
-          {/* Social Links */}
-          {hasSocial && (
-            <div className="flex items-center justify-center gap-2 mt-4">
-              {user.instagram && (
-                <SocialLink href={`https://instagram.com/${user.instagram}`} icon={Instagram} label="Instagram" color="hover:bg-pink-50 hover:text-pink-600 text-gray-500" />
-              )}
-              {user.twitter && (
-                <SocialLink href={`https://twitter.com/${user.twitter}`} icon={Twitter} label="Twitter" color="hover:bg-sky-50 hover:text-sky-500 text-gray-500" />
-              )}
-              {user.youtube && (
-                <SocialLink href={`https://youtube.com/@${user.youtube}`} icon={Youtube} label="YouTube" color="hover:bg-red-50 hover:text-red-600 text-gray-500" />
-              )}
-              {user.website && (
-                <SocialLink href={user.website} icon={Globe} label="Website" color="hover:bg-indigo-50 hover:text-indigo-600 text-gray-500" />
-              )}
-            </div>
-          )}
-
-          {/* Share button */}
           <button
             onClick={handleShare}
             className="mt-4 inline-flex items-center gap-2 text-xs text-gray-400 hover:text-indigo-600 transition border border-gray-200 hover:border-indigo-200 px-3 py-1.5 rounded-full"
@@ -305,7 +217,7 @@ export default function PublicProfileClient({ user }: { user: User }) {
             </p>
             <div className="space-y-2.5">
               {user.links.map((link) => (
-                <LinkButton key={link.id} link={link} username={user.username} />
+                <LinkButton key={link.id} link={link} />
               ))}
             </div>
           </div>
