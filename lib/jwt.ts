@@ -4,7 +4,11 @@ const JWT_SECRET = process.env.JWT_SECRET || 'weiiz-secret-change-in-production'
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 
 export interface TokenPayload {
-  id: string;
+  id?: string      // opsional
+userId?: string  // ditambah — dipakai route login
+username?: string // ditambah — dipakai route login
+email: string    // tetap wajib
+role: ...        // tetap wajib
   email: string;
   role: 'USER' | 'ADMIN' | 'CREATOR';
 }
